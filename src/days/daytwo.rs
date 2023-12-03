@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use std::{fs::File, io::BufReader};
+use std::{collections::HashMap, fs::File, io::BufReader};
 pub(crate) fn daytwo1(
     filename: &str,
     red_ct: u32,
@@ -53,18 +53,40 @@ pub(crate) fn daytwo1(
     Ok(game_id_sum)
 }
 
-#[test]
-fn test_delimter() {
-    let input = "7 green, 4 blue, 3 red; 4 blue, 10 red, 1 green; 1 blue, 9 red";
-    let list: Vec<&str> = input
-        .split(";")
-        .flat_map(|grab| grab.split(","))
-        .flat_map(|a| a.split(" "))
-        .filter(|s| !s.is_empty())
+pub(crate) fn daytwo2(filename: &str) -> std::io::Result<u32> {
+    use std::io::BufRead;
+    let file = File::open(filename)?;
+    let reader: Vec<String> = BufReader::new(file)
+        .lines()
+        .filter_map(Result::ok)
         .collect();
 
-    list.chunks_exact(2).for_each(|pair| {
-        assert!(pair.len() == 2);
-        let count = pair[0].parse::<u32>().unwrap();
-    });
+    let sum_of_min: u32 = reader
+        .iter()
+        .filter_map(|input| {
+            let (_, snd_hlft) = input.split_once(':')?;
+            let num_and_cols_str: Vec<&str> = snd_hlft
+                .split(";")
+                .flat_map(|grab| grab.split(","))
+                .flat_map(|a| a.split(" "))
+                .filter(|s| !s.is_empty())
+                .collect();
+            let max_val_map = num_and_cols_str
+                .chunks_exact(2)
+                .filter_map(|chunk| chunk[0].parse::<u32>().ok().map(|num| (chunk[1], num)))
+                .fold(HashMap::new(), |mut acc, (color, num)| {
+                    acc.entry(color)
+                        .and_modify(|e: &mut u32| *e = (*e).max(num))
+                        .or_insert(num);
+                    acc
+                });
+            let mind_red = *max_val_map.get("red").unwrap_or(&0);
+            let min_blue = *max_val_map.get("blue").unwrap_or(&0);
+            let min_green = *max_val_map.get("green").unwrap_or(&0);
+
+            Some(mind_red * min_blue * min_green)
+        })
+        .sum();
+
+    Ok(sum_of_min)
 }

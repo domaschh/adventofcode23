@@ -7,4 +7,5 @@ fn main() {
         "{}",
         days::daytwo::daytwo1("inputday2.txt", 12, 14, 13).unwrap()
     );
+    println!("{}", days::daytwo::daytwo2("inputday2.txt").unwrap());
 }
