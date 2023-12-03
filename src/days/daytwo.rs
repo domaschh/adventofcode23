@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use std::{collections::HashMap, fs::File, io::BufReader};
 pub(crate) fn daytwo1(
     filename: &str,
