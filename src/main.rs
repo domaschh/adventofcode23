@@ -33,6 +33,6 @@ fn main() {
     );
     println!(
         "Day4: 2 {}",
-        days::dayfour::dayfour1("inputday4.txt").unwrap()
+        days::dayfour::dayfour2("inputday4.txt").unwrap()
     );
 }
