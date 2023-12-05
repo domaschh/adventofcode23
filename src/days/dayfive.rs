@@ -1,4 +1,5 @@
-use std::{collections::HashMap, fs::File, io::BufReader, ops::Range, process};
+use std::fs::File;
+use std::io::BufReader;
 
 use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
 
@@ -7,24 +8,6 @@ struct Smap {
     from_l: i64,
     to_l: i64,
     range: i64,
-}
-
-impl PartialEq for Smap {
-    fn eq(&self, other: &Self) -> bool {
-        self.from_l.eq(&other.from_l)
-    }
-}
-impl Eq for Smap {}
-impl PartialOrd for Smap {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.from_l.cmp(&other.from_l))
-    }
-}
-
-impl Ord for Smap {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.from_l.cmp(&other.from_l)
-    }
 }
 
 pub(crate) fn dayfive1(filename: &str) -> Result<i64, String> {
@@ -131,24 +114,6 @@ fn parse_line_to_map(input: &str) -> Smap {
             .and_then(|str| str.parse::<i64>().ok())
             .unwrap_or(0),
         from_l: spliterator
-            .next()
-            .and_then(|str| str.parse::<i64>().ok())
-            .unwrap_or(0),
-        range: spliterator
-            .next()
-            .and_then(|str| str.parse::<i64>().ok())
-            .unwrap_or(0),
-    }
-}
-
-fn parse_line_to_reverse_map(input: &str) -> Smap {
-    let mut spliterator = input.split(" ");
-    Smap {
-        from_l: spliterator
-            .next()
-            .and_then(|str| str.parse::<i64>().ok())
-            .unwrap_or(0),
-        to_l: spliterator
             .next()
             .and_then(|str| str.parse::<i64>().ok())
             .unwrap_or(0),
