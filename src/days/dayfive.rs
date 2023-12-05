@@ -82,8 +82,8 @@ pub(crate) fn dayfive1(filename: &str) -> Result<i64, String> {
 
     let min = seeds
         .iter()
-        .map(|&seedvalue| {
-            let soil = find_in_map(&ssm, seedvalue);
+        .map(|&seed| {
+            let soil = find_in_map(&ssm, seed);
             let fertilizer = find_in_map(&sfm, soil);
             let water = find_in_map(&fwm, fertilizer);
             let light = find_in_map(&wlm, water);
@@ -98,14 +98,10 @@ pub(crate) fn dayfive1(filename: &str) -> Result<i64, String> {
 }
 
 fn find_in_map(map: &Vec<Smap>, input_val: i64) -> i64 {
-    let mut outputvalue = None;
-    for entry in map {
-        if input_val >= entry.from_l && input_val <= entry.from_l + entry.range - 1 {
-            outputvalue = Some((input_val - entry.from_l) + entry.to_l);
-            break;
-        }
-    }
-    outputvalue.unwrap_or(input_val)
+    map.iter()
+        .find(|entry| input_val >= entry.from_l && input_val <= entry.from_l + entry.range - 1)
+        .map(|e| (input_val - e.from_l) + e.to_l)
+        .unwrap_or(input_val)
 }
 
 fn parse_line_to_map(input: &str) -> Smap {
