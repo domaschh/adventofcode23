@@ -91,17 +91,17 @@ pub(crate) fn daythree2(filename: &str) -> std::io::Result<u32> {
                 .collect::<Vec<_>>();
             let (_, groups) = indices.into_iter().fold(
                 (None, Vec::new()),
-                |(last_idx, mut groups), (curr_i, digit)| match last_idx {
-                    Some((start, end)) if curr_i == end + 1 => {
-                        if let Some((start, end_ref, number)) = groups.last_mut() {
-                            *end_ref = curr_i;
-                            *number = &line.1[*start..=*end_ref];
+                |(last_idx, mut groups), (curr_idx, digit)| match last_idx {
+                    Some((start, end)) if curr_idx == end + 1 => {
+                        if let Some((star_idx, end_idx, number)) = groups.last_mut() {
+                            *end_idx = curr_idx;
+                            *number = &line.1[*star_idx..=*end_idx];
                         }
-                        (Some((start, curr_i)), groups)
+                        (Some((start, curr_idx)), groups)
                     }
                     _ => {
-                        groups.push((curr_i, curr_i, digit));
-                        (Some((curr_i, curr_i)), groups)
+                        groups.push((curr_idx, curr_idx, digit));
+                        (Some((curr_idx, curr_idx)), groups)
                     }
                 },
             );

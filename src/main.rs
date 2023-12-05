@@ -27,4 +27,12 @@ fn main() {
         "Day3: 2 {}",
         days::daythree::daythree2("inputday3.txt").unwrap()
     );
+    println!(
+        "Day4: 1 {}",
+        days::dayfour::dayfour1("inputday4.txt").unwrap()
+    );
+    println!(
+        "Day4: 2 {}",
+        days::dayfour::dayfour1("inputday4.txt").unwrap()
+    );
 }
