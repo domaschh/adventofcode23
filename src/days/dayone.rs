@@ -1,13 +1,11 @@
 use std::{fs::File, io::BufRead, io::BufReader};
 
-pub(crate) fn dayone1(filename: &str) -> std::io::Result<u32> {
-    let file = File::open(filename)?;
-    let reader: Vec<String> = BufReader::new(file)
-        .lines()
-        .filter_map(Result::ok)
-        .collect();
+use super::utils::read_file;
 
-    let result = reader
+pub(crate) fn dayone1(filename: &str) -> std::io::Result<u32> {
+    let lines: Vec<String> = read_file(filename)?;
+
+    let result = lines
         .iter()
         .filter_map(|line| {
             let fst_digit = line.chars().find_map(|char| char.to_digit(10))?;
@@ -21,13 +19,9 @@ pub(crate) fn dayone1(filename: &str) -> std::io::Result<u32> {
 }
 
 pub(crate) fn dayone2(filename: &str) -> std::io::Result<u32> {
-    let file = File::open(filename)?;
-    let reader: Vec<String> = BufReader::new(file)
-        .lines()
-        .filter_map(Result::ok)
-        .collect();
+    let lines: Vec<String> = read_file(filename)?;
 
-    let result = reader
+    let result = lines
         .iter()
         .filter_map(|line| {
             let fst_digit = line

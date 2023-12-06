@@ -1,18 +1,15 @@
 use std::{collections::HashMap, fs::File, io::BufReader};
+
+use super::utils::read_file;
 pub(crate) fn daytwo1(
     filename: &str,
     red_ct: u32,
     blue_ct: u32,
     green_ct: u32,
 ) -> std::io::Result<u32> {
-    use std::io::BufRead;
-    let file = File::open(filename)?;
-    let reader: Vec<String> = BufReader::new(file)
-        .lines()
-        .filter_map(Result::ok)
-        .collect();
+    let lines: Vec<String> = read_file(filename)?;
 
-    let game_id_sum: u32 = reader
+    let game_id_sum: u32 = lines
         .iter()
         .filter_map(|input| {
             let (fst_hlt, snd_hlft) = input.split_once(':')?;
@@ -53,14 +50,9 @@ pub(crate) fn daytwo1(
 }
 
 pub(crate) fn daytwo2(filename: &str) -> std::io::Result<u32> {
-    use std::io::BufRead;
-    let file = File::open(filename)?;
-    let reader: Vec<String> = BufReader::new(file)
-        .lines()
-        .filter_map(Result::ok)
-        .collect();
+    let lines = read_file(filename)?;
 
-    let sum_of_min: u32 = reader
+    let sum_of_min: u32 = lines
         .iter()
         .filter_map(|input| {
             let (_, snd_hlft) = input.split_once(':')?;

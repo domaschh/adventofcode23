@@ -21,7 +21,7 @@ pub(crate) fn daysix1(filename: &str) -> Result<i64, String> {
 
 pub(crate) fn daysix2(filename: &str) -> Result<i64, String> {
     let lines = read_file(filename).map_err(|_| "Reading File")?;
-    let race_to_beat = race_from_lines(&lines)?;
+    let race_to_beat = single_race_from_line(&lines)?;
     let index_of_first_time_beat = (0..=race_to_beat.time)
         .map(|time_held| time_held * (race_to_beat.time - time_held))
         .position(|d_traveled| d_traveled > race_to_beat.distance);
@@ -59,7 +59,7 @@ fn races_from_lines<'vlt>(
     Ok(races_to_beat)
 }
 
-fn race_from_lines(input: &Vec<String>) -> Result<RaceToBeat, String> {
+fn single_race_from_line(input: &Vec<String>) -> Result<RaceToBeat, String> {
     let time: i64 = input
         .iter()
         .nth(0)

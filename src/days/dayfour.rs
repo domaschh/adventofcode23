@@ -4,15 +4,12 @@ use std::{
     io::BufReader,
 };
 
-pub(crate) fn dayfour1(filename: &str) -> Result<u32, String> {
-    use std::io::BufRead;
-    let file = File::open(filename).map_err(|_| "Filereadding")?;
-    let reader: Vec<String> = BufReader::new(file)
-        .lines()
-        .filter_map(Result::ok)
-        .collect();
+use crate::days::utils::read_file;
 
-    let totalworth = reader
+pub(crate) fn dayfour1(filename: &str) -> Result<u32, String> {
+    let lines: Vec<String> = read_file(filename).map_err(|_| "Error reading file")?;
+
+    let totalworth = lines
         .iter()
         .filter_map(|line| {
             let (winning_nums, my_nums) =
@@ -40,15 +37,10 @@ pub(crate) fn dayfour1(filename: &str) -> Result<u32, String> {
 }
 
 pub(crate) fn dayfour2(filename: &str) -> Result<u32, String> {
-    use std::io::BufRead;
-    let file = File::open(filename).map_err(|_| "Filereadding")?;
-    let reader: Vec<String> = BufReader::new(file)
-        .lines()
-        .filter_map(Result::ok)
-        .collect();
+    let lines: Vec<String> = read_file(filename).map_err(|_| "Error reading file")?;
 
-    let mut cardmap: HashMap<usize, u32> = (0..reader.len()).map(|i| (i, 1)).collect();
-    reader.iter().enumerate().for_each(|(i, line)| {
+    let mut cardmap: HashMap<usize, u32> = (0..lines.len()).map(|i| (i, 1)).collect();
+    lines.iter().enumerate().for_each(|(i, line)| {
         let (winning_nums, my_nums) = line
             .split_once(":")
             .unwrap()
