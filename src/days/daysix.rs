@@ -1,5 +1,3 @@
-use itertools::Itertools;
-
 use super::utils::read_file;
 
 #[derive(Debug, Clone)]
@@ -24,17 +22,18 @@ pub(crate) fn daysix1(filename: &str) -> Result<i64, String> {
 pub(crate) fn daysix2(filename: &str) -> Result<i64, String> {
     let lines = read_file(filename).map_err(|_| "Reading File")?;
     let race_to_beat = race_from_lines(&lines)?;
-    let variations = (0..=race_to_beat.time)
+    let index_of_first_time_beat = (0..=race_to_beat.time)
         .map(|time_held| time_held * (race_to_beat.time - time_held))
-        .filter(|&d_traveled| d_traveled > race_to_beat.distance)
-        .count() as i64;
+        .position(|d_traveled| d_traveled > race_to_beat.distance);
 
-    Ok(variations)
+    Ok(index_of_first_time_beat
+        .map(|index| race_to_beat.time - 2 * index as i64 + 1)
+        .unwrap_or(0)) //no times beat
 }
 
-fn races_from_lines<'vl>(
-    input: &'vl Vec<String>,
-) -> Result<impl Iterator<Item = RaceToBeat> + 'vl, String> {
+fn races_from_lines<'vlt>(
+    input: &'vlt Vec<String>,
+) -> Result<impl Iterator<Item = RaceToBeat> + 'vlt, String> {
     let time_str_iter = input
         .iter()
         .nth(0)
@@ -60,7 +59,7 @@ fn races_from_lines<'vl>(
     Ok(races_to_beat)
 }
 
-fn race_from_lines<'vl>(input: &'vl Vec<String>) -> Result<RaceToBeat, String> {
+fn race_from_lines(input: &Vec<String>) -> Result<RaceToBeat, String> {
     let time: i64 = input
         .iter()
         .nth(0)
@@ -69,9 +68,7 @@ fn race_from_lines<'vl>(input: &'vl Vec<String>) -> Result<RaceToBeat, String> {
         .filter(|s| !s.is_empty())
         .skip(1)
         .fold(0, |acc, s| {
-            let digit = s.parse::<i64>().unwrap_or(0);
-            let multiplier = 10i64.pow(s.len() as u32); // Calculate the multiplier based on the length of the number
-            acc * multiplier + digit
+            acc * 10i64.pow(s.len() as u32) + s.parse::<i64>().unwrap_or(0)
         });
 
     let distance: i64 = input
@@ -82,9 +79,7 @@ fn race_from_lines<'vl>(input: &'vl Vec<String>) -> Result<RaceToBeat, String> {
         .filter(|s| !s.is_empty())
         .skip(1)
         .fold(0, |acc, s| {
-            let digit = s.parse::<i64>().unwrap_or(0);
-            let multiplier = 10i64.pow(s.len() as u32); // Calculate the multiplier based on the length of the number
-            acc * multiplier + digit
+            acc * 10i64.pow(s.len() as u32) + s.parse::<i64>().unwrap_or(0)
         });
 
     Ok(RaceToBeat { time, distance })
