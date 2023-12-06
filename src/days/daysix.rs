@@ -55,10 +55,9 @@ fn races_from_lines(input: &[String]) -> Result<impl Iterator<Item = RaceToBeat>
     Ok(races_to_beat)
 }
 
-fn single_race_from_line(input: &Vec<String>) -> Result<RaceToBeat, String> {
+fn single_race_from_line(input: &[String]) -> Result<RaceToBeat, String> {
     let time: i64 = input
-        .iter()
-        .nth(0)
+        .get(0)
         .ok_or("Error reading times")?
         .split_whitespace()
         .filter(|s| !s.is_empty())
@@ -68,8 +67,7 @@ fn single_race_from_line(input: &Vec<String>) -> Result<RaceToBeat, String> {
         });
 
     let distance: i64 = input
-        .iter()
-        .nth(1)
+        .get(0)
         .ok_or("Error reading times")?
         .split_whitespace()
         .filter(|s| !s.is_empty())

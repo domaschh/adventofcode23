@@ -23,8 +23,7 @@ pub(crate) fn dayfive1(filename: &str) -> Result<i64, String> {
         .map(|string| {
             itertools::Itertools::collect_vec(
                 string
-                    .split(" ")
-                    .into_iter()
+                    .split(' ')
                     .skip(1)
                     .filter_map(|s| s.parse::<i64>().ok()),
             )
@@ -91,8 +90,8 @@ pub(crate) fn dayfive1(filename: &str) -> Result<i64, String> {
             let light = find_in_map(&wlm, water);
             let temperature = find_in_map(&ltm, light);
             let humidity = find_in_map(&thm, temperature);
-            let location = find_in_map(&hlm, humidity);
-            location
+            
+            find_in_map(&hlm, humidity)
         })
         .min();
 
@@ -101,13 +100,13 @@ pub(crate) fn dayfive1(filename: &str) -> Result<i64, String> {
 
 fn find_in_map(map: &[Smap], input_val: i64) -> i64 {
     map.iter()
-        .find(|entry| input_val >= entry.from_l && input_val <= entry.from_l + entry.range - 1)
+        .find(|entry| input_val >= entry.from_l && input_val < entry.from_l + entry.range)
         .map(|e| (input_val - e.from_l) + e.to_l)
         .unwrap_or(input_val)
 }
 
 fn parse_line_to_map(input: &str) -> Smap {
-    let mut spliterator = input.split(" ");
+    let mut spliterator = input.split(' ');
     Smap {
         to_l: spliterator
             .next()
@@ -136,8 +135,7 @@ pub(crate) fn dayfive2(filename: &str) -> Result<i64, String> {
         .first()
         .map(|string| {
             string
-                .split(" ")
-                .into_iter()
+                .split(' ')
                 .skip(1)
                 .filter_map(|s| s.parse::<i64>().ok())
         })
@@ -215,8 +213,8 @@ pub(crate) fn dayfive2(filename: &str) -> Result<i64, String> {
                     let light = find_in_map(&wlm, water);
                     let temperature = find_in_map(&ltm, light);
                     let humidity = find_in_map(&thm, temperature);
-                    let location = find_in_map(&hlm, humidity);
-                    location
+                    
+                    find_in_map(&hlm, humidity)
                 })
                 .min()
         })

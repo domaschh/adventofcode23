@@ -5,7 +5,7 @@ pub(crate) fn daythree1(filename: &str) -> std::io::Result<u32> {
     let file = File::open(filename)?;
     let lines: Vec<(usize, String)> = BufReader::new(file)
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .enumerate()
         .collect();
 
@@ -78,7 +78,7 @@ pub(crate) fn daythree2(filename: &str) -> std::io::Result<u32> {
     let file = File::open(filename)?;
     let lines: Vec<(usize, String)> = BufReader::new(file)
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .enumerate()
         .collect();
 
@@ -182,15 +182,12 @@ pub(crate) fn daythree2(filename: &str) -> std::io::Result<u32> {
         .sum())
 }
 fn is_sign(input: &str) -> bool {
-    match input {
-        "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "0" | "." => false,
-        _ => true,
-    }
+    !matches!(
+        input,
+        "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "0" | "."
+    )
 }
 
 fn is_gear(input: &str) -> bool {
-    match input {
-        "*" => true,
-        _ => false,
-    }
+    matches!(input, "*")
 }
