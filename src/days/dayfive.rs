@@ -204,7 +204,7 @@ pub(crate) fn dayfive2(filename: &str) -> Result<i64, String> {
     }
 
     let min = pairs
-        .par_iter()
+        .iter()
         .flat_map(|&range| {
             (range[0]..range[1])
                 .into_par_iter()
@@ -306,14 +306,14 @@ pub(crate) fn dayfive2intervalsmerged(filename: &str) -> Result<i64, String> {
         }
     }
 
-    merge_intervals(&mut ssm);
-    merge_intervals(&mut sfm);
-    merge_intervals(&mut fwm);
-    merge_intervals(&mut wlm);
-    merge_intervals(&mut ltm);
-    merge_intervals(&mut thm);
-    merge_intervals(&mut hlm);
-    merge_input_intervals(&mut pairs);
+    // merge_intervals(&mut ssm);
+    // merge_intervals(&mut sfm);
+    // merge_intervals(&mut fwm);
+    // merge_intervals(&mut wlm);
+    // merge_intervals(&mut ltm);
+    // merge_intervals(&mut thm);
+    // merge_intervals(&mut hlm);
+    // merge_input_intervals(&mut pairs);
 
     let min = pairs
         .par_iter()
@@ -342,8 +342,6 @@ fn merge_intervals(intervals: &mut Vec<Smap>) {
         return;
     }
 
-    intervals.sort_by_key(|k| k.from_l);
-
     let mut i = 0;
     while i < intervals.len() - 1 {
         if intervals[i].to_l >= intervals[i + 1].from_l {
@@ -360,8 +358,6 @@ fn merge_input_intervals(arr: &mut Vec<[i64; 2]>) {
     if arr.is_empty() {
         return;
     }
-
-    arr.sort_by_key(|k| k[0]);
 
     let mut i = 0;
     while i < arr.len() - 1 {
