@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::BufReader;
 
-use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 #[derive(Debug, Clone)]
 struct Smap {
@@ -15,7 +15,7 @@ pub(crate) fn dayfive1(filename: &str) -> Result<i64, String> {
     let file = File::open(filename).map_err(|_| "Sa")?;
     let inputlines: Vec<String> = BufReader::new(file)
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .filter(|l| !l.is_empty())
         .collect();
     let seeds = inputlines
@@ -99,7 +99,7 @@ pub(crate) fn dayfive1(filename: &str) -> Result<i64, String> {
     Ok(min.unwrap_or(0))
 }
 
-fn find_in_map(map: &Vec<Smap>, input_val: i64) -> i64 {
+fn find_in_map(map: &[Smap], input_val: i64) -> i64 {
     map.iter()
         .find(|entry| input_val >= entry.from_l && input_val <= entry.from_l + entry.range - 1)
         .map(|e| (input_val - e.from_l) + e.to_l)
@@ -129,7 +129,7 @@ pub(crate) fn dayfive2(filename: &str) -> Result<i64, String> {
     let file = File::open(filename).map_err(|_| "Sa")?;
     let inputlines: Vec<String> = BufReader::new(file)
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .filter(|l| !l.is_empty())
         .collect();
     let seeds: Vec<i64> = inputlines

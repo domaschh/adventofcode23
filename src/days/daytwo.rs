@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fs::File, io::BufReader};
+use std::{collections::HashMap};
 
 use super::utils::read_file;
 pub(crate) fn daytwo1(
@@ -13,12 +13,12 @@ pub(crate) fn daytwo1(
         .iter()
         .filter_map(|input| {
             let (fst_hlt, snd_hlft) = input.split_once(':')?;
-            let (_, num) = fst_hlt.split_once(" ")?;
+            let (_, num) = fst_hlt.split_once(' ')?;
             let game_id = num.parse::<u32>().ok()?;
             let num_and_cols_str: Vec<&str> = snd_hlft
-                .split(";")
-                .flat_map(|grab| grab.split(","))
-                .flat_map(|a| a.split(" "))
+                .split(';')
+                .flat_map(|grab| grab.split(','))
+                .flat_map(|a| a.split(' '))
                 .filter(|s| !s.is_empty())
                 .collect();
 
@@ -57,9 +57,9 @@ pub(crate) fn daytwo2(filename: &str) -> std::io::Result<u32> {
         .filter_map(|input| {
             let (_, snd_hlft) = input.split_once(':')?;
             let num_and_cols_str: Vec<&str> = snd_hlft
-                .split(";")
-                .flat_map(|grab| grab.split(","))
-                .flat_map(|a| a.split(" "))
+                .split(';')
+                .flat_map(|grab| grab.split(','))
+                .flat_map(|a| a.split(' '))
                 .filter(|s| !s.is_empty())
                 .collect();
             let max_val_map = num_and_cols_str

@@ -14,7 +14,7 @@ pub(crate) fn daythree1(filename: &str) -> std::io::Result<u32> {
         .map(|line| {
             let indices = line
                 .1
-                .match_indices(|c: char| c.is_digit(10))
+                .match_indices(|c: char| c.is_ascii_digit())
                 .collect::<Vec<_>>();
             let (_, groups) = indices.into_iter().fold(
                 (None, Vec::new()),
@@ -32,7 +32,7 @@ pub(crate) fn daythree1(filename: &str) -> std::io::Result<u32> {
                     }
                 },
             );
-            return (line.0, groups);
+            (line.0, groups)
         })
         .collect();
 
@@ -87,7 +87,7 @@ pub(crate) fn daythree2(filename: &str) -> std::io::Result<u32> {
         .map(|line| {
             let indices = line
                 .1
-                .match_indices(|c: char| c.is_digit(10))
+                .match_indices(|c: char| c.is_ascii_digit())
                 .collect::<Vec<_>>();
             let (_, groups) = indices.into_iter().fold(
                 (None, Vec::new()),
@@ -105,7 +105,7 @@ pub(crate) fn daythree2(filename: &str) -> std::io::Result<u32> {
                     }
                 },
             );
-            return (line.0, groups);
+            (line.0, groups)
         })
         .collect();
 
@@ -133,7 +133,7 @@ pub(crate) fn daythree2(filename: &str) -> std::io::Result<u32> {
                 let found_num = num.2.parse::<u32>().unwrap();
                 gear_ratios
                     .entry((curr_row_index, (num.1 + 1).min(width - 1)))
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push(found_num);
 
                 continue 'nums;
@@ -146,7 +146,7 @@ pub(crate) fn daythree2(filename: &str) -> std::io::Result<u32> {
                 let found_num = num.2.parse::<u32>().unwrap();
                 gear_ratios
                     .entry((curr_row_index, (num.0 as i32 - 1).max(0) as usize))
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push(found_num);
                 continue 'nums;
             }
@@ -157,7 +157,7 @@ pub(crate) fn daythree2(filename: &str) -> std::io::Result<u32> {
                     let found_num = num.2.parse::<u32>().unwrap();
                     gear_ratios
                         .entry(((curr_row_index as i32 - 1).max(0) as usize, i))
-                        .or_insert_with(Vec::new)
+                        .or_default()
                         .push(found_num);
                     continue 'nums;
                 }
@@ -167,7 +167,7 @@ pub(crate) fn daythree2(filename: &str) -> std::io::Result<u32> {
                     let found_num = num.2.parse::<u32>().unwrap();
                     gear_ratios
                         .entry(((curr_row_index + 1).min(height - 1), i))
-                        .or_insert_with(Vec::new)
+                        .or_default()
                         .push(found_num);
                     continue 'nums;
                 }

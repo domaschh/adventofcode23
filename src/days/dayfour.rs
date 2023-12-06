@@ -1,7 +1,5 @@
 use std::{
     collections::{HashMap, HashSet},
-    fs::File,
-    io::BufReader,
 };
 
 use crate::days::utils::read_file;
@@ -13,17 +11,17 @@ pub(crate) fn dayfour1(filename: &str) -> Result<u32, String> {
         .iter()
         .filter_map(|line| {
             let (winning_nums, my_nums) =
-                line.split_once(":")?.1.split_once("|").map(|(w, m)| {
+                line.split_once(':')?.1.split_once('|').map(|(w, m)| {
                     (
-                        w.split(" ")
+                        w.split(' ')
                             .filter_map(|str| str::parse::<u32>(str).ok())
                             .collect::<HashSet<u32>>(),
-                        m.split(" ").filter_map(|str| str::parse::<u32>(str).ok()),
+                        m.split(' ').filter_map(|str| str::parse::<u32>(str).ok()),
                     )
                 })?;
             Some(
                 my_nums
-                    .filter(|num| winning_nums.contains(&num))
+                    .filter(|num| winning_nums.contains(num))
                     .enumerate()
                     .fold(
                         0,
@@ -42,21 +40,21 @@ pub(crate) fn dayfour2(filename: &str) -> Result<u32, String> {
     let mut cardmap: HashMap<usize, u32> = (0..lines.len()).map(|i| (i, 1)).collect();
     lines.iter().enumerate().for_each(|(i, line)| {
         let (winning_nums, my_nums) = line
-            .split_once(":")
+            .split_once(':')
             .unwrap()
             .1
-            .split_once("|")
+            .split_once('|')
             .map(|(w, m)| {
                 (
-                    w.split(" ")
+                    w.split(' ')
                         .filter_map(|str| str::parse::<u32>(str).ok())
                         .collect::<HashSet<u32>>(),
-                    m.split(" ").filter_map(|str| str::parse::<u32>(str).ok()),
+                    m.split(' ').filter_map(|str| str::parse::<u32>(str).ok()),
                 )
             })
             .unwrap();
         let matching_nums = my_nums
-            .filter(|num| winning_nums.contains(&num))
+            .filter(|num| winning_nums.contains(num))
             .fold(0, |acc, _| acc + 1);
         let copycount = *cardmap.get(&i).unwrap_or(&1);
         (i + 1..=i + matching_nums).for_each(|nextrow| {

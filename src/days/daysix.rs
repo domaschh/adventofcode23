@@ -31,20 +31,16 @@ pub(crate) fn daysix2(filename: &str) -> Result<i64, String> {
         .unwrap_or(0)) //no times beat
 }
 
-fn races_from_lines<'vlt>(
-    input: &'vlt Vec<String>,
-) -> Result<impl Iterator<Item = RaceToBeat> + 'vlt, String> {
+fn races_from_lines(input: &[String]) -> Result<impl Iterator<Item = RaceToBeat> + '_, String> {
     let time_str_iter = input
-        .iter()
-        .nth(0)
+        .get(0)
         .ok_or("Error reading times")?
-        .split(" ")
+        .split(' ')
         .filter(|s| !s.is_empty());
     let distance_str_iter = input
-        .iter()
-        .nth(1)
+        .get(1)
         .ok_or("Error reading distances")?
-        .split(" ")
+        .split(' ')
         .filter(|s| !s.is_empty());
 
     let races_to_beat = time_str_iter

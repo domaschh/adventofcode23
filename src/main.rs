@@ -43,7 +43,7 @@ fn main() {
 
     // println!(
     //     "Day5: 2 {}",
-    //     days::dayfive::dayfive2intervalsmerged("inputday5.txt").unwrap()
+    //     days::dayfive::dayfive2("inputday5.txt").unwrap()
     // );
     println!(
         "Day6: 1 {}",
