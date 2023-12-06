@@ -306,15 +306,6 @@ pub(crate) fn dayfive2intervalsmerged(filename: &str) -> Result<i64, String> {
         }
     }
 
-    // merge_intervals(&mut ssm);
-    // merge_intervals(&mut sfm);
-    // merge_intervals(&mut fwm);
-    // merge_intervals(&mut wlm);
-    // merge_intervals(&mut ltm);
-    // merge_intervals(&mut thm);
-    // merge_intervals(&mut hlm);
-    // merge_input_intervals(&mut pairs);
-
     let min = pairs
         .par_iter()
         .flat_map(|&range| {
@@ -335,37 +326,4 @@ pub(crate) fn dayfive2intervalsmerged(filename: &str) -> Result<i64, String> {
         .min();
 
     Ok(min.unwrap_or(0))
-}
-
-fn merge_intervals(intervals: &mut Vec<Smap>) {
-    if intervals.is_empty() {
-        return;
-    }
-
-    let mut i = 0;
-    while i < intervals.len() - 1 {
-        if intervals[i].to_l >= intervals[i + 1].from_l {
-            intervals[i].to_l = std::cmp::max(intervals[i].to_l, intervals[i + 1].to_l);
-            intervals[i].range = intervals[i].to_l - intervals[i].from_l;
-            intervals.remove(i + 1);
-        } else {
-            i += 1;
-        }
-    }
-}
-
-fn merge_input_intervals(arr: &mut Vec<[i64; 2]>) {
-    if arr.is_empty() {
-        return;
-    }
-
-    let mut i = 0;
-    while i < arr.len() - 1 {
-        if arr[i][1] >= arr[i + 1][0] {
-            arr[i][1] = std::cmp::max(arr[i][1], arr[i + 1][1]);
-            arr.remove(i + 1);
-        } else {
-            i += 1;
-        }
-    }
 }
