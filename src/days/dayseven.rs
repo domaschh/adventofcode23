@@ -108,13 +108,13 @@ pub(crate) fn dayseven1(filepath: &str) -> Result<i64, String> {
         .iter()
         .enumerate()
         .map(|(i, hand)| {
-            println!("{:?}", hand);
-            println!(
-                "{:?} + {:?} = {:?}",
-                i + 1,
-                hand.bid,
-                (i + 1) as i64 * hand.bid
-            );
+            // println!("{:?}", hand);
+            // println!(
+            //     "{:?} + {:?} = {:?}",
+            //     i + 1,
+            //     hand.bid,
+            //     (i + 1) as i64 * hand.bid
+            // );
             (i + 1) as i64 * hand.bid
         })
         .sum())
