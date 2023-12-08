@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use gcd::Gcd;
-use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 use super::utils::read_file;
 
@@ -67,14 +66,14 @@ pub(crate) fn dayeight2(filepath: &str) -> Result<u64, String> {
             )
         })
         .collect();
-    let mut elements = jumps
+    let mut curr_els = jumps
         .keys()
         .zip(jumps.values())
         .filter(|(key, _)| key.ends_with("A"))
         .collect::<Vec<_>>();
 
     let mut count = 0;
-    let mut f_z_encounters: Vec<Option<u64>> = vec![None; elements.len()];
+    let mut f_z_encounters: Vec<Option<u64>> = vec![None; curr_els.len()];
     for instruction in instr_sequence_str.chars().cycle() {
         //Check if each start has already visited some z
         if f_z_encounters.iter().all(|v| v.is_some()) {
@@ -85,17 +84,13 @@ pub(crate) fn dayeight2(filepath: &str) -> Result<u64, String> {
                 .ok_or("Empty list encountered")?);
         }
         //check if any of the start positions entered a node whch ends with z
-        elements.iter().enumerate().for_each(|(i, &(element, _))| {
+        curr_els.iter().enumerate().for_each(|(i, &(element, _))| {
             if element.ends_with("Z") {
-                if let Some(entry) = f_z_encounters.get_mut(i) {
-                    if entry.is_none() {
-                        *entry = Some(count);
-                    }
-                }
+                get_or_set(&mut f_z_encounters, i, count);
             }
         });
         //move node forward
-        for (val, next) in elements.iter_mut() {
+        for (val, next) in curr_els.iter_mut() {
             let key_value_pair = if instruction == 'L' {
                 jumps
                     .get_key_value(&next.left)
@@ -111,6 +106,13 @@ pub(crate) fn dayeight2(filepath: &str) -> Result<u64, String> {
         count += 1;
     }
     Ok(count)
+}
+fn get_or_set(f_z_encounters: &mut Vec<Option<u64>>, i: usize, count: u64) {
+    if let Some(entry) = f_z_encounters.get_mut(i) {
+        if entry.is_none() {
+            *entry = Some(count);
+        }
+    }
 }
 
 fn gcd(a: u64, b: u64) -> u64 {

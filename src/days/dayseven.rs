@@ -21,7 +21,7 @@ struct Hand {
 
 impl PartialEq for Hand {
     fn eq(&self, other: &Self) -> bool {
-        if self.ty == other.ty && self.cards == other.cards {
+        if self.ty == other.ty {
             true
         } else {
             false
