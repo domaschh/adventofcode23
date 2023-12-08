@@ -76,6 +76,7 @@ pub(crate) fn dayeight2(filepath: &str) -> Result<u64, String> {
     let mut count = 0;
     let mut f_z_encounters: Vec<Option<u64>> = vec![None; elements.len()];
     for instruction in instr_sequence_str.chars().cycle() {
+        //Check if each start has already visited some z
         if f_z_encounters.iter().all(|v| v.is_some()) {
             return Ok(f_z_encounters
                 .into_iter()
@@ -83,6 +84,7 @@ pub(crate) fn dayeight2(filepath: &str) -> Result<u64, String> {
                 .reduce(|acc, v| lcm(acc, v))
                 .ok_or("Empty list encountered")?);
         }
+        //check if any of the start positions entered a node whch ends with z
         elements.iter().enumerate().for_each(|(i, &(element, _))| {
             if element.ends_with("Z") {
                 if let Some(entry) = f_z_encounters.get_mut(i) {
@@ -92,7 +94,7 @@ pub(crate) fn dayeight2(filepath: &str) -> Result<u64, String> {
                 }
             }
         });
-
+        //move node forward
         for (val, next) in elements.iter_mut() {
             let key_value_pair = if instruction == 'L' {
                 jumps
