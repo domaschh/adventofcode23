@@ -1,11 +1,7 @@
-
-
 use super::utils::read_file;
 
 pub(crate) fn dayone1(filename: &str) -> std::io::Result<u32> {
-    let lines: Vec<String> = read_file(filename)?;
-
-    let result = lines
+    Ok(read_file(filename)?
         .iter()
         .filter_map(|line| {
             let fst_digit = line.chars().find_map(|char| char.to_digit(10))?;
@@ -13,15 +9,11 @@ pub(crate) fn dayone1(filename: &str) -> std::io::Result<u32> {
 
             Some(fst_digit * 10 + snd_digit)
         })
-        .sum();
-
-    Ok(result)
+        .sum())
 }
 
 pub(crate) fn dayone2(filename: &str) -> std::io::Result<u32> {
-    let lines: Vec<String> = read_file(filename)?;
-
-    let result = lines
+    Ok(read_file(filename)?
         .iter()
         .filter_map(|line| {
             let fst_digit = line
@@ -36,9 +28,7 @@ pub(crate) fn dayone2(filename: &str) -> std::io::Result<u32> {
 
             Some(fst_digit * 10 + snd_digit)
         })
-        .sum();
-
-    Ok(result)
+        .sum())
 }
 
 fn to_digit_peek(c: char, index: usize, line: &str) -> Option<u32> {

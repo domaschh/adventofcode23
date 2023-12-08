@@ -6,12 +6,19 @@ version = 3
 name = "adventcode23"
 version = "0.1.0"
 dependencies = [
+ "array_map",
  "itertools",
  "nom",
  "rayon",
  "smallvec",
  "strum",
 ]
+
+[[package]]
+name = "array_map"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d8918af69f2ecff99addb930228c0d8bff80afbcb95066f340edf9aeee60a76f"
 
 [[package]]
 name = "autocfg"
