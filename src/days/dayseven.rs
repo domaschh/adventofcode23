@@ -1,7 +1,12 @@
-use super::utils::read_file;
-use std::collections::HashMap;
+use std::{collections::HashMap, time::Instant};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+use super::utils::read_file;
+
+const CHARS: [&'static str; 14] = [
+    "A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2", "1",
+];
+
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd)]
 enum HandType {
     HighCard = 1,
     OnePair = 2,
@@ -12,280 +17,119 @@ enum HandType {
     FiveOfAKind = 7,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 struct Hand {
-    cards: [char; 5],
+    bid: u16,
+    cards: (u8, u8, u8, u8, u8),
     ty: HandType,
-    bid: i64,
 }
 
-impl PartialEq for Hand {
-    fn eq(&self, other: &Self) -> bool {
-        if self.ty == other.ty {
-            true
-        } else {
-            false
-        }
-    }
-}
-impl Eq for Hand {}
-
-impl PartialOrd for Hand {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        if self == other {
-            Some(std::cmp::Ordering::Equal)
-        } else {
-            if self.ty != other.ty {
-                Some(self.ty.cmp(&other.ty))
-            } else {
-                for (&myc, &othc) in self.cards.iter().zip(other.cards.iter()) {
-                    if myc == othc {
-                        continue;
-                    } else {
-                        if myc.is_digit(10) && othc.is_digit(10) {
-                            return Some(myc.cmp(&othc));
-                        } else if othc.is_digit(10) && !myc.is_digit(10) {
-                            return Some(std::cmp::Ordering::Greater);
-                        } else if myc.is_digit(10) && !othc.is_digit(10) {
-                            return Some(std::cmp::Ordering::Less);
-                        } else {
-                            return Some(myc.cmp(&othc).reverse());
-                        }
-                    }
+impl Hand {
+    fn new(cards: &str, bids: &str, part2: bool) -> Self {
+        let v: Vec<u8> = cards
+            .chars()
+            .map(|char| {
+                if part2 && char == 'J' {
+                    0
+                } else {
+                    CHARS
+                        .iter()
+                        .rev()
+                        .position(|x| x == &char.to_string())
+                        .unwrap() as u8
                 }
-                unreachable!()
-            }
+            })
+            .collect();
+
+        Self {
+            bid: bids.parse::<u16>().unwrap(),
+            cards: (v[0], v[1], v[2], v[3], v[4]),
+            ty: Self::calc_strength(cards, part2),
         }
     }
-}
 
-impl Ord for Hand {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        if self == other {
-            std::cmp::Ordering::Equal
-        } else {
-            if self.ty != other.ty {
-                self.ty.cmp(&other.ty)
-            } else {
-                for (&myc, &othc) in self.cards.iter().zip(other.cards.iter()) {
-                    if myc == othc {
-                        continue;
-                    } else {
-                        if myc.is_digit(10) && othc.is_digit(10) {
-                            return myc.cmp(&othc);
-                        } else if othc.is_digit(10) && !myc.is_digit(10) {
-                            return std::cmp::Ordering::Greater;
-                        } else if myc.is_digit(10) && !othc.is_digit(10) {
-                            return std::cmp::Ordering::Less;
-                        } else {
-                            return myc.cmp(&othc);
-                        }
-                    }
+    fn calc_strength(cards: &str, part2: bool) -> HandType {
+        let mut dist: HashMap<char, u16> = HashMap::new();
+        for char in cards.chars() {
+            dist.entry(char).and_modify(|x| *x += 1).or_insert(1);
+        }
+
+        let mut scores: Vec<u16> = dist
+            .keys()
+            .map(|key| {
+                if part2 && key == &'J' {
+                    0_u16
+                } else {
+                    dist.get(key).unwrap().to_owned()
                 }
-                unreachable!()
-            }
+            })
+            .collect();
+        scores.sort_by(|a, b| b.cmp(a));
+
+        if part2 {
+            scores[0] += cards.chars().filter(|a| a == &'J').count() as u16;
         }
+
+        let strength_type = match scores[0] {
+            5 => HandType::FiveOfAKind,
+            4 => HandType::FourOfAKind,
+            3 => {
+                if scores[1] == 2 {
+                    HandType::FullHouse
+                } else {
+                    HandType::ThreeOfAKind
+                }
+            }
+            2 => {
+                if scores[1] == 2 {
+                    HandType::TwoPair
+                } else {
+                    HandType::OnePair
+                }
+            }
+            _ => HandType::HighCard,
+        };
+
+        strength_type
     }
 }
-pub(crate) fn dayseven1(filepath: &str) -> Result<i64, String> {
-    let lines = read_file(filepath).map_err(|_| "Reading file failed")?;
-    let mut res: Vec<Hand> = lines
-        .iter()
-        .filter_map(|line| {
-            let (card_str, bid_str) = line.split_once(" ")?;
-            let mut cards: [char; 5] = ['0'; 5];
-            card_str
-                .chars()
-                .enumerate()
-                .take(5)
-                .for_each(|(i, c)| cards[i] = c);
-
-            Some(chars_to_hand(cards, bid_str.parse::<i64>().ok()?))
+pub(crate) fn dayseven1(filepath: &str) -> usize {
+    let input = read_file(filepath).unwrap();
+    let mut hands: Vec<Hand> = input
+        .into_iter()
+        .map(|line| {
+            let s = line.split_once(" ").unwrap();
+            Hand::new(s.0, s.1, false)
         })
         .collect();
-    res.sort();
-    Ok(res
+
+    hands.sort_unstable_by_key(|hand| (hand.ty, hand.cards));
+
+    let winnings = hands
         .iter()
         .enumerate()
-        .map(|(i, hand)| {
-            // println!("{:?}", hand);
-            // println!(
-            //     "{:?} + {:?} = {:?}",
-            //     i + 1,
-            //     hand.bid,
-            //     (i + 1) as i64 * hand.bid
-            // );
-            (i + 1) as i64 * hand.bid
+        .fold(0, |acc, (i, hand)| acc + (hand.bid as usize * (i + 1)));
+
+    winnings
+}
+
+pub(crate) fn dayseven2(filepath: &str) -> usize {
+    let input = read_file(filepath).unwrap();
+
+    let mut hands: Vec<Hand> = input
+        .into_iter()
+        .map(|line| {
+            let s = line.split_once(" ").unwrap();
+            Hand::new(s.0, s.1, true)
         })
-        .sum())
-}
+        .collect();
 
-fn chars_to_hand(cards: [char; 5], bid: i64) -> Hand {
-    let occurrences: HashMap<char, usize> = cards.iter().fold(HashMap::new(), |mut acc, &c| {
-        *acc.entry(c).or_insert(0) += 1;
-        acc
-    });
-    let biggest_occurence = *occurrences.values().max().unwrap_or(&0);
-    let distinc_card_count = occurrences.len();
-    let ty = match (biggest_occurence, distinc_card_count) {
-        (5, _) => HandType::FiveOfAKind,
-        (4, _) => HandType::FourOfAKind,
-        (3, 2) => HandType::FullHouse,
-        (3, _) => HandType::ThreeOfAKind,
-        (2, 3) => HandType::TwoPair,
-        (2, 4) => HandType::OnePair,
-        _ => HandType::HighCard,
-    };
-    Hand { cards, ty, bid }
-}
+    hands.sort_unstable_by_key(|hand| (hand.ty, hand.cards));
 
-pub(crate) fn dayseven2(filepath: &str) -> Result<i64, String> {
-    Ok(1)
-}
+    let winnings = hands
+        .iter()
+        .enumerate()
+        .fold(0, |acc, (i, hand)| acc + (hand.bid as usize * (i + 1)));
 
-#[test]
-fn test_highcard() {
-    let cards: [char; 5] = ['A', 'B', 'C', 'D', 'E'];
-    let bid = 0;
-    let hand = chars_to_hand(cards, bid);
-    assert_eq!(hand.ty, HandType::HighCard);
-}
-
-#[test]
-fn test_pair() {
-    let cards: [char; 5] = ['A', 'B', 'C', 'A', 'E'];
-    let bid = 0;
-    let hand = chars_to_hand(cards, bid);
-    assert_eq!(hand.ty, HandType::OnePair);
-}
-#[test]
-fn test_two_pair() {
-    let cards: [char; 5] = ['A', 'B', 'C', 'A', 'B'];
-    let bid = 0;
-    let hand = chars_to_hand(cards, bid);
-    assert_eq!(hand.ty, HandType::TwoPair);
-}
-
-#[test]
-fn test_tripple() {
-    let cards: [char; 5] = ['A', 'B', 'C', 'A', 'A'];
-    let bid = 0;
-    let hand = chars_to_hand(cards, bid);
-    assert_eq!(hand.ty, HandType::ThreeOfAKind);
-}
-
-#[test]
-fn test_fullhouse() {
-    let cards: [char; 5] = ['A', 'B', 'B', 'A', 'A'];
-    let bid = 0;
-    let hand = chars_to_hand(cards, bid);
-    assert_eq!(hand.ty, HandType::FullHouse);
-}
-
-#[test]
-fn test_fourokind() {
-    let cards: [char; 5] = ['A', 'B', 'A', 'A', 'A'];
-    let bid = 0;
-    let hand = chars_to_hand(cards, bid);
-    assert_eq!(hand.ty, HandType::FourOfAKind);
-}
-
-#[test]
-fn test_fiveokind() {
-    let cards: [char; 5] = ['A', 'A', 'A', 'A', 'A'];
-    let bid = 0;
-    let hand = chars_to_hand(cards, bid);
-    assert_eq!(hand.ty, HandType::FiveOfAKind);
-}
-
-#[test]
-fn cards_are_eq() {
-    let hand1 = Hand {
-        ty: HandType::OnePair,
-        cards: ['A'; 5],
-        bid: 3,
-    };
-    let hand2 = Hand {
-        ty: HandType::OnePair,
-        cards: ['A'; 5],
-        bid: 3,
-    };
-
-    assert_eq!(hand1, hand2)
-}
-
-#[test]
-fn test_strength_3() {
-    let hand1 = Hand {
-        ty: HandType::FullHouse,
-        cards: ['K', 'A', '8', '8', '8'],
-        bid: 3,
-    };
-    let hand2 = Hand {
-        ty: HandType::FullHouse,
-        cards: ['T', 'B', '8', '8', '8'],
-        bid: 3,
-    };
-
-    let mut v = vec![hand1, hand2];
-    v.sort();
-    assert_eq!(v.get(0).unwrap().cards[0], 'T');
-    assert_eq!(v.get(1).unwrap().cards[0], 'K');
-}
-
-#[test]
-fn test_strength_4() {
-    let hand1 = Hand {
-        ty: HandType::FullHouse,
-        cards: ['3', '3', '8', '8', '8'],
-        bid: 3,
-    };
-    let hand2 = Hand {
-        ty: HandType::FullHouse,
-        cards: ['2', '2', '8', '8', '8'],
-        bid: 3,
-    };
-
-    let mut v = vec![hand1, hand2];
-    v.sort();
-    assert_eq!(v.get(0).unwrap().cards[0], '2');
-    assert_eq!(v.get(1).unwrap().cards[0], '3');
-}
-
-#[test]
-fn test_strength_5() {
-    let hand1 = Hand {
-        ty: HandType::FullHouse,
-        cards: ['3', '3', '8', '8', '8'],
-        bid: 3,
-    };
-    let hand2 = Hand {
-        ty: HandType::FullHouse,
-        cards: ['Q', 'Q', '8', '8', '8'],
-        bid: 3,
-    };
-
-    let mut v = vec![hand1, hand2];
-    v.sort();
-    assert_eq!(v.get(0).unwrap().cards[0], '3');
-    assert_eq!(v.get(1).unwrap().cards[0], 'Q');
-}
-
-#[test]
-fn test_strength_6() {
-    let hand1 = Hand {
-        ty: HandType::FullHouse,
-        cards: ['3', '3', '8', '8', '8'],
-        bid: 3,
-    };
-    let hand2 = Hand {
-        ty: HandType::FullHouse,
-        cards: ['Q', 'Q', '8', '8', '8'],
-        bid: 3,
-    };
-
-    let mut v = vec![hand2, hand1];
-    v.sort();
-    assert_eq!(v.get(0).unwrap().cards[0], '3');
-    assert_eq!(v.get(1).unwrap().cards[0], 'Q');
+    winnings
 }
