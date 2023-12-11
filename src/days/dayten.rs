@@ -48,11 +48,12 @@ impl Sub for Coord {
     }
 }
 
-struct Maze {
+#[derive(Debug)]
+struct PipeMap {
     map: Vec<Vec<u8>>,
     start: Coord,
 }
-impl Maze {
+impl PipeMap {
     fn new(map: Vec<Vec<u8>>) -> Self {
         // get the initial point
         let start = Coord(
@@ -84,8 +85,9 @@ impl Maze {
     }
 }
 
+#[derive(Debug)]
 struct PipeWalk<'p> {
-    plane: &'p Maze,
+    plane: &'p PipeMap,
     next: Coord,
     prev: Coord,
     len: u32,
@@ -117,7 +119,7 @@ pub(crate) fn dayten1(data: &str) -> Result<u32, String> {
         .map(|l| l.bytes().collect::<Vec<_>>())
         .collect::<Vec<_>>();
 
-    let maze = Maze::new(map);
+    let maze = PipeMap::new(map);
 
     let mut start_1 = None;
     let mut start_2 = None;
@@ -145,6 +147,66 @@ pub(crate) fn dayten1(data: &str) -> Result<u32, String> {
         Err("No starting positions found".to_string())
     }
 }
-pub(crate) fn dayten2(data: &str) -> Result<u32, String> {
-    return Ok(1);
+pub(crate) fn dayten2(data: &str) -> Result<isize, String> {
+    let lines = read_file(data).map_err(|_| "reading filed")?;
+    let map: Vec<Vec<u8>> = lines
+        .into_iter()
+        .map(|l| l.bytes().collect::<Vec<_>>())
+        .collect::<Vec<_>>();
+
+    let maze = PipeMap::new(map);
+
+    let mut start_1 = None;
+
+    // find the starting points right after S
+    for i in [N, S, E, W] {
+        let mut iter = maze.iter(i);
+        if iter.next().is_some() {
+            if start_1.is_some() {
+                break;
+            }
+            start_1 = Some(iter);
+        }
+    }
+
+    if let Some(s) = start_1 {
+        let mut ordered_points = vec![];
+        ordered_points.push(s.prev);
+        ordered_points.push(s.next);
+        let star_coordinate = s.plane.start;
+        for (coordinate, _) in s {
+            ordered_points.push(coordinate);
+            if coordinate == star_coordinate {
+                break;
+            }
+        }
+
+        //https://en.wikipedia.org/wiki/Shoelace_formula
+        let shoelace_area = shoelace_area(&ordered_points);
+        //Using pics theorem we can umform and get the points inside our area
+        //https://en.wikipedia.org/wiki/Pick%27s_theorem
+        //i = (2A - b) / 2 + 1
+        let actual_area = ((2 * shoelace_area - ordered_points.len() as isize) / 2) + 1;
+        Ok(actual_area)
+    } else {
+        Ok(0)
+    }
+}
+
+fn shoelace_area(points: &Vec<Coord>) -> isize {
+    let mut area: isize = 0;
+
+    for i in 0..points.len() {
+        let (x1, y1) = (points[i].0[0], points[i].0[1]);
+        let (x2, y2) = if i == points.len() - 1 {
+            (points[0].0[0], points[0].0[1])
+        } else {
+            (points[i + 1].0[0], points[i + 1].0[1])
+        };
+
+        area += x1 as isize * y2 as isize;
+        area -= x2 as isize * y1 as isize;
+    }
+
+    (area as isize).abs() / 2
 }
