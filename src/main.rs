@@ -66,4 +66,31 @@ fn main() {
         "Day8: 2 {}",
         days::dayeight::dayeight2("inputday8.txt").unwrap()
     );
+    println!(
+        "Day9: 1 {}",
+        days::daynine::daynine1("inputday9.txt").unwrap()
+    );
+
+    println!(
+        "Day9: 2 {}",
+        days::daynine::daynine2("inputday9.txt").unwrap()
+    );
+    println!(
+        "Day10: 1 {}",
+        days::dayten::dayten1("inputday10.txt").unwrap()
+    );
+
+    println!(
+        "Day10: 2 {}",
+        days::dayten::dayten1("inputday10.txt").unwrap()
+    );
+    println!(
+        "Day11: 1 {}",
+        days::dayeleven::dayeleven1("inputday11.txt").unwrap()
+    );
+
+    println!(
+        "Day11: 2 {}",
+        days::dayeleven::dayeleven1("inputday11.txt").unwrap()
+    );
 }
