@@ -82,7 +82,7 @@ fn main() {
 
     println!(
         "Day10: 2 {}",
-        days::dayten::dayten1("inputday10.txt").unwrap()
+        days::dayten::dayten2("inputday10.txt").unwrap()
     );
     println!(
         "Day11: 1 {}",
