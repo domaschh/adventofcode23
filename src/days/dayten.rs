@@ -96,8 +96,6 @@ impl<'m> Iterator for PipeWalk<'m> {
     type Item = (Coord, u32);
     fn next(&mut self) -> Option<Self::Item> {
         let dir = self.plane.symbol(self.next);
-        // getting this right was the tricky and tedious part,
-        // had to use the right types used and double check
         let next = match (self.next - self.prev, dir) {
             (N, b'|') | (W, b'L') | (E, b'J') => self.next + N,
             (S, b'|') | (W, b'F') | (E, b'7') => self.next + S,
@@ -170,23 +168,23 @@ pub(crate) fn dayten2(data: &str) -> Result<isize, String> {
     }
 
     if let Some(s) = start_1 {
-        let mut ordered_points = vec![];
-        ordered_points.push(s.prev);
-        ordered_points.push(s.next);
+        let mut ordered_loop = vec![];
+        ordered_loop.push(s.prev);
+        ordered_loop.push(s.next);
         let star_coordinate = s.plane.start;
         for (coordinate, _) in s {
-            ordered_points.push(coordinate);
+            ordered_loop.push(coordinate);
             if coordinate == star_coordinate {
                 break;
             }
         }
 
         //https://en.wikipedia.org/wiki/Shoelace_formula
-        let shoelace_area = shoelace_area(&ordered_points);
+        let shoelace_area = shoelace_area(&ordered_loop);
         //Using pics theorem we can umform and get the points inside our area
         //https://en.wikipedia.org/wiki/Pick%27s_theorem
         //i = (2A - b) / 2 + 1
-        let actual_area = ((2 * shoelace_area - ordered_points.len() as isize) / 2) + 1;
+        let actual_area = ((2 * shoelace_area - ordered_loop.len() as isize) / 2) + 1;
         Ok(actual_area)
     } else {
         Ok(0)

@@ -91,6 +91,6 @@ fn main() {
 
     println!(
         "Day11: 2 {}",
-        days::dayeleven::dayeleven1("inputday11.txt").unwrap()
+        days::dayeleven::dayeleven2("inputday11.txt").unwrap()
     );
 }
