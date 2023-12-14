@@ -95,4 +95,6 @@ fn main() {
     );
     println!("Day12: 1 {}", days::daytwelve::daytwelve1());
     println!("Day12: 2 {}", days::daytwelve::daytwelve2());
+    println!("Day13: 1 {}", days::daythirteen::daythirteen1());
+    println!("Day13: 2 {}", days::daythirteen::daythirteen2());
 }
